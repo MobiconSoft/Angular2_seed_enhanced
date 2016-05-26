@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head><% if (IS_MOBILE) { %>
+    <!-- 
+      CSP: http://content-security-policy.com/ 
+      Customize this policy to fit your own app's needs. For more guidance, see:
+            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+        Some notes:
+            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+    --> 
+    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/; script-src 'self' 'unsafe-inline' 'unsafe-eval'"/>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no"><% } %>
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <% if (!IS_MOBILE) { %>
+    <base href="<%= APP_BASE %>"><% } %>
+    <title><%= APP_TITLE %></title>
+    
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- inject:css -->
+    <!-- endinject -->
+    
+    <!-- for hybrid mobile app i.e 'build.dev(prod).mobile' of gulp task --><% if (IS_MOBILE) { %>
+    <script type="text/javascript" src="cordova.js"></script><% } %>
+    <script type="text/javascript" src="frameworks/module_fix.js"></script>
+    
+    <!-- shims:js -->
+    <!-- endinject -->
+  </head>
+  <body>
+
+    <tm-app>Loading App ...</tm-app>
+    <% if (!IS_MOBILE) { %>
+    <script>
+    // function.name (all IE)
+    // Remove once https://github.com/angular/angular/issues/6501 is fixed.
+    /*! @source http://stackoverflow.com/questions/6903762/function-name-not-supported-in-ie*/
+    if (!Object.hasOwnProperty('name')) {
+      Object.defineProperty(Function.prototype, 'name', {
+        get: function() {
+          var matches = this.toString().match(/^\s*function\s*((?![0-9])[a-zA-Z0-9_$]*)\s*\(/);
+          var name = matches && matches.length > 1 ? matches[1] : "";
+          // For better performance only parse once, and then cache the
+          // result through a new accessor for repeated access.
+          Object.defineProperty(this, 'name', {value: name});
+          return name;
+        }
+      });
+    }
+    </script><% } %>
+
+    <% if (ENV === 'dev') { %>
+    <script>
+      System.config(<%=
+        JSON.stringify(SYSTEM_CONFIG, null, 2)
+      %>)
+    </script>
+    <% } %>
+
+    <!-- libs:js -->
+    <!-- endinject -->
+
+    <!-- inject:js -->
+    <!-- endinject -->
+    
+    <% if (ENV === 'dev') { %>
+    <script>
+    System.import('<%= BOOTSTRAP_MODULE %>')
+      .catch(function (e) {
+        console.error(e,
+          'Report this error at https://tidemark.atlassian.net/secure/Dashboard.jspa');
+      });
+    </script>
+    <% } %>
+
+  </body>
+</html>
